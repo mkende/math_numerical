@@ -1,0 +1,5 @@
+Revision history for Perl module Math::Numerical
+
+0.01 2022-10-03
+
+ - Initial release with the find_root and bracket methods
