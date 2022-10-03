@@ -1,0 +1,14 @@
+.git/
+.gitignore
+FormattedText-.*
+blib/
+Makefile$
+Makefile.old
+MANIFEST.bak
+MANIFEST.skip
+MYMETA.*
+pm_to_blib
+pp_includes.txt
+formatted_text.sublime-project
+formatted_text.sublime-workspace
+.*.stackdump
