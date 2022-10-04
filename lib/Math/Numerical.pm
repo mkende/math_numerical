@@ -17,7 +17,7 @@ use POSIX ();
 
 =pod
 
-=encoding utf8;
+=encoding utf8
 
 =head1 NAME
 
@@ -84,7 +84,7 @@ C<[$x1, $x2]>, tries to find a root of the function (a point where the
 function’s value is 0). The root found may be either inside or outside the
 starting interval.
 
-If the function is sucessful it returns the root found in scalar context or, in
+If the function is successful it returns the root found in scalar context or, in
 list context, a list with the root and the value of the function at that point
 (which may not be exactly C<0>).
 
@@ -209,7 +209,7 @@ has a root somewhere between these two points (the root is I<bracketed> by these
 points). The found points will be either inside or outside the starting
 interval.
 
-If the function is sucessful, it returns a list of four elements with the values
+If the function is successful, it returns a list of four elements with the values
 C<$a> and C<$b> and then the values of function at these two points. Otherwise
 it returns an empty list.
 
@@ -337,7 +337,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 =item NR
 
-L<http://http://numerical.recipes/>
+L<http://numerical.recipes/>
 
 =back
 
