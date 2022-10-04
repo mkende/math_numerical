@@ -1,6 +1,6 @@
 .git/
 .gitignore
-FormattedText-.*
+Math-Numericalw-.*
 blib/
 Makefile$
 Makefile.old

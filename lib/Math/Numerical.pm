@@ -36,7 +36,7 @@ Numerical analysis and scientific computing related functions.
 =head1 DESCRIPTION
 
 This module offers functions to manipulate numerical functions such as root
-finding, derivatives, etc. Most of the functions of this module can receive a
+finding (solver), derivatives, etc. Most of the functions of this module can receive a
 C<$func> argument. This argument should always be a code reference (an anonymous
 sub or a reference to a named code block). And that referenced function should
 expect a single scalar (numeric) argument and return a single scalar (numeric)
@@ -103,20 +103,20 @@ number of times that C<$func> will be evaluated. Defaults to I<100>.
 
 =item C<do_bracket>
 
-Whether the C<L</bracket>> function should be used to bracket a root of the
+Whether the C<L<bracket|/bracket>> function should be used to bracket a root of the
 function before finding the root. If this is set to a false value, then the
 passed C<$x1> and C<$x2> values must already form a bracket (that is, the
 function must take values of opposite sign at these two points). Note that, when
-they do, the C<L</bracket>> function will immediately return these values. So,
+they do, the C<L<bracket|/bracket>> function will immediately return these values. So,
 if C<find_root> return a result with C<do_bracket> set to a I<false> value, it
 will return the same result when C<do_bracket> is set to a I<true> value.
 However, if C<do_bracket> is set to a I<false> value, then C<find_root> will
-immediately C<L<croak|Capr>> if the starting interval does not form a bracket
+immediately C<L<croak|Carp>> if the starting interval does not form a bracket
 of a root of the function.
 
-When set to a I<true> value, the C<L</bracket>> function is called with the
+When set to a I<true> value, the C<L<bracket|/bracket>> function is called with the
 same arguments as those given to C<find_root>, so any parameter supported by
-C<L</bracket>> can also be passed to C<find_root>.
+C<L<bracket|/bracket>> can also be passed to C<find_root>.
 
 Defaults to I<1>.
 
@@ -127,7 +127,7 @@ Defaults to I<0.00001>.
 =back
 
 In addition, as noted above, when C<do_bracket> is true, any of the parameters
-supported by the C<L</bracket>> function can be passed and they will be
+supported by the C<L<bracket|/bracket>> function can be passed and they will be
 forwarded to that function.
 
 =cut
@@ -213,7 +213,7 @@ If the function is successful, it returns a list of four elements with the value
 C<$a> and C<$b> and then the values of function at these two points. Otherwise
 it returns an empty list.
 
-The function will C<L<croak|Capr>> if C<$x1> and C<$x2> are equal.
+The function will C<L<croak|Carp>> if C<$x1> and C<$x2> are equal.
 
 The current implementation of this method is a mix of the methods C<zbrac> and
 C<zbrak> from the I<L<Numerical Recipes/NR>> book.

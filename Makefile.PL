@@ -8,7 +8,7 @@ WriteMakefile(
     NAME             => 'Math::Numerical',
     AUTHOR           => q{Mathias Kende <mathias@cpan.org>},
     VERSION_FROM     => 'lib/Math/Numerical.pm',
-    ABSTRACT         => "Algorithms for numerical functions (root findings, etc.)",
+    ABSTRACT         => "Algorithms for numerical functions (solver, root findings, etc.)",
     LICENSE          => 'mit',
     MIN_PERL_VERSION => '5.022',
     MAN3PODS         => {},
