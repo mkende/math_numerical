@@ -13,11 +13,14 @@ WriteMakefile(
     MIN_PERL_VERSION => '5.022',
     MAN3PODS         => {},
     CONFIGURE_REQUIRES => {
-        'ExtUtils::MakeMaker' => '0',
+      'ExtUtils::MakeMaker' => '0',
     },
     BUILD_REQUIRES => {
     },
     PREREQ_PM => {
+    },
+    TEST_REQUIRES => {
+      'Test2::V0'    => 0,
     },
     NO_MYMETA => 1,
     META_MERGE => {
