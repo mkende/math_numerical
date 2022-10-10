@@ -63,8 +63,8 @@ our %EXPORT_TAGS = (all => \@EXPORT_OK);
 # This will need to be adapted if we start using bigfloat.
 Readonly my $EPS =>
   $Config{uselongdouble} ? POSIX::LDBL_EPSILON : POSIX::DBL_EPSILON;
-Readonly $_DEFAULT_TOLERANCE => 0.00001;  # exposed for tests only.
-Readonly my $DEFAULT_MAX_ITERATIONS = 100;
+Readonly our $_DEFAULT_TOLERANCE => 0.00001;  # exposed for tests only.
+Readonly my $DEFAULT_MAX_ITERATIONS => 100;
 
 # Wraps the given numerical function in a way where we’re guaranteeing that it’s
 # called in a scalar context and where we’re trapping its errors.
@@ -150,7 +150,7 @@ sub find_root($func, $x1, $x2, %params) {
   my ($p, $q, $r, $s, $tol1, $xm);
   if ($do_bracket) {
     ($xa, $xb, $fa, $fb) = bracket($func, $x1, $x2, %params);
-    croak 'Can’t bracket a root of the function' unless defined $a;
+    croak 'Can’t bracket a root of the function' unless defined $xa;
   } else {
     ($xa, $xb) = ($x1, $x2);
     ($fa, $fb) = ($f->($xa), $f->($xb));
