@@ -3,7 +3,7 @@
 severity =  2
 verbose = %f:%l: %m (%p, Severity: %s).\n
 # We still include some policies whose default severity is 1
-include = ValuesAndExpressions::ProhibitInterpolationOfLiterals CodeLayout::ProhibitTrailingWhitespace
+include = ValuesAndExpressions::ProhibitInterpolationOfLiterals CodeLayout::ProhibitTrailingWhitespace CodeLayout::RequireTidyCode
 
 # And we do disable some policies:
 

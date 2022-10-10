@@ -1,8 +1,6 @@
 # The reference for all the formatting options is at:
 # https://metacpan.org/pod/distribution/Perl-Tidy/bin/perltidy#FORMATTING-OPTIONS
 
---notidy
-
 # Basic options
 
 --character-encoding=utf8
@@ -49,7 +47,7 @@
 --opening-token-right                 # braces, parens, and brackets on the right after a comma.
 #--stack-opening-tokens          # ??? # Several opening tokens are on the same lines (can be controlled per type of tokens if needed).
 --comma-arrow-breakpoint=5            # Control how hash are indented. 5 is the default.
---paren-vertical-tightness-closing=0  # Break before a closing paren, it would be great to use 1 here to try not to break but it works badly with hash (https://rt.cpan.org/Ticket/Display.html?id=136417).
+--paren-vertical-tightness-closing=3  # Break before a closing paren except in a hash constructior.
 --square-bracket-vertical-tightness-closing=0  # Break before a closing square bracket.
 --brace-vertical-tightness-closing=0  # Break before a closing brace.
 # It might be interesting to play with -wn and -wnxl but creating a good config will probably be difficult.
@@ -59,5 +57,5 @@
 
 # Vertical alignment
 # Unfortunately we can’t control vertical alignment depending on the context. So let’s disable it for now.
-# Feature request for more control: https://rt.cpan.org/Ticket/Display.html?id=136417
+# Feature request for more control: https://rt.cpan.org/Ticket/Display.html?id=136416
 -novalign

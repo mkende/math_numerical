@@ -61,14 +61,15 @@ our @EXPORT_OK = qw(find_root solve bracket);
 our %EXPORT_TAGS = (all => \@EXPORT_OK);
 
 # This will need to be adapted if we start using bigfloat.
-Readonly my $EPS =>
-  $Config{uselongdouble} ? POSIX::LDBL_EPSILON : POSIX::DBL_EPSILON;
+Readonly my $EPS => $Config{uselongdouble}
+    ? POSIX::LDBL_EPSILON
+    : POSIX::DBL_EPSILON;
 Readonly our $_DEFAULT_TOLERANCE => 0.00001;  # exposed for tests only.
 Readonly my $DEFAULT_MAX_ITERATIONS => 100;
 
 # Wraps the given numerical function in a way where we’re guaranteeing that it’s
 # called in a scalar context and where we’re trapping its errors.
-sub _wrap_func($func) {
+sub _wrap_func ($func) {
   croak "The passed $func is not a code reference" unless ref($func) eq 'CODE';
   return sub {
     my $r = eval { &{$func} };
@@ -164,24 +165,27 @@ sub _do_find_root_brent ($f, $s) {
   $s->{xm} = ($s->{c} - $s->{b}) / 2;
   if (abs($s->{xm}) <= $s->{tol1} || $s->{fb} == 0) {
     $s->{ret} = [$s->{b}, $s->{fb}];
-    return 1
+    return 1;
   }
   if (abs($s->{e}) >= $s->{tol1} && abs($s->{fa}) > abs($s->{fb})) {
     $s->{s} = $s->{fb} / $s->{fa};
     if ($s->{a} == $s->{c}) {
-      $s->{p} = 2 * $s->{xm} *$s->{s};
+      $s->{p} = 2 * $s->{xm} * $s->{s};
       $s->{q} = 1 - $s->{s};
     } else {
       $s->{q} = $s->{fa} / $s->{fc};
       $s->{r} = $s->{fb} / $s->{fc};
-      $s->{p} = $s->{s} * (2 * $s->{xm} * $s->{q} * ($s->{q} - $s->{r})- ($s->{b} - $s->{a}) * ($s->{r} - 1));
+      $s->{p} =
+          $s->{s} *
+          (2 * $s->{xm} * $s->{q} * ($s->{q} - $s->{r}) -
+            ($s->{b} - $s->{a}) * ($s->{r} - 1));
       $s->{q} = ($s->{q} - 1) * ($s->{r} - 1) * ($s->{s} - 1);
     }
     $s->{q} = -$s->{q} if $s->{p} > 0;
     $s->{p} = abs($s->{p});
     Readonly my $interp_coef => 3;
     my $min1 = $interp_coef * $s->{xm} * $s->{q} - abs($s->{tol1} * $s->{q});
-    my $min2 = abs($s->{e}* $s->{q});
+    my $min2 = abs($s->{e} * $s->{q});
     if (2 * $s->{p} < ($min1 < $min2 ? $min1 : $min2)) {
       $s->{e} = $s->{d};
       $s->{d} = $s->{p} / $s->{q};
@@ -193,7 +197,7 @@ sub _do_find_root_brent ($f, $s) {
   }
   @{$s}{'a', 'fa'} = @{$s}{'b', 'fb'};
   if (abs($s->{d}) > $s->{tol1}) {
-    $s->{b} +=$s->{d};
+    $s->{b} += $s->{d};
   } else {
     $s->{b} += _sign($s->{tol1}, $s->{xm});
   }
@@ -201,7 +205,7 @@ sub _do_find_root_brent ($f, $s) {
   return 0;
 }
 
-sub find_root($func, $x1, $x2, %params) {
+sub find_root ($func, $x1, $x2, %params) {
   my $do_bracket = $params{do_bracket} // 1;
   my $max_iter = $params{max_iterations} // $DEFAULT_MAX_ITERATIONS;
   my $f = _wrap_func($func);
@@ -213,12 +217,12 @@ sub find_root($func, $x1, $x2, %params) {
     ($xa, $xb) = ($x1, $x2);
     ($fa, $fb) = ($f->($xa), $f->($xb));
     croak 'A root must be bracketed in [\$x1; \$x2]'
-      if ($fa > 0 && $fb > 0) || ($fa < 0 && $fb <0);
+        if ($fa > 0 && $fb > 0) || ($fa < 0 && $fb < 0);
   }
 
   my $brent_state = _create_find_root_brent_state($xa, $xb, $fa, $fb, %params);
 
-  for my $i (1..$max_iter) {
+  for my $i (1 .. $max_iter) {
     if (defined $brent_state && _do_find_root_brent($f, $brent_state)) {
       return wantarray ? @{$brent_state->{ret}} : $brent_state->{ret}[0];
     }
@@ -329,7 +333,7 @@ sub _do_bracket_inward ($f, $s) {
   my $dx = ($s->{x2} - $s->{x1}) / $s->{split};
   my $xa = $s->{x1};
   my ($fa, $fb) = ($s->{f1});
-  for my $j (1..$s->{split}) {
+  for my $j (1 .. $s->{split}) {
     my $xb = $xa + $dx;
     $fb = $f->($xb);
     if ($fa * $fb < 0) {
@@ -357,10 +361,10 @@ sub _do_bracket_outward ($f, $s) {
     return 1;
   }
   if (abs($s->{f1}) < abs($s->{f2})) {
-    $s->{x1} += $s->{factor} * ($s->{x1} -$s->{x2});
+    $s->{x1} += $s->{factor} * ($s->{x1} - $s->{x2});
     $s->{f1} = $f->($s->{x1});
   } else {
-    $s->{x2} += $s->{factor} * ($s->{x2} -$s->{x1});
+    $s->{x2} += $s->{factor} * ($s->{x2} - $s->{x1});
     $s->{f2} = $f->($s->{x2});
   }
   return 0;
@@ -387,9 +391,9 @@ sub bracket ($func, $x1, $x2 = undef, %params) {
   }
 
   croak 'One of do_outward and do_inward at least must be true'
-    unless defined $outward_state || defined $inward_state;
+      unless defined $outward_state || defined $inward_state;
 
-  for my $i (1..$max_iter) {
+  for my $i (1 .. $max_iter) {
     # We start with outward because the first iteration does nothing and just
     # checks the bounds that were given by the user.
     if (defined $outward_state && _do_bracket_outward($f, $outward_state)) {
