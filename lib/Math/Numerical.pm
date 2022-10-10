@@ -145,8 +145,8 @@ sub find_root($func, $x1, $x2, %params) {
   my $tol = $params{tolerance} // $_DEFAULT_TOLERANCE;
   my $max_iter = $params{max_iterations} // $DEFAULT_MAX_ITERATIONS;
   my $f = _wrap_func($func);
-  my ($xa, $xb, $xc, $xd, $xe);  # = ($x1, $x2, $x2);
-  my ($fa, $fb, $fc);  # = ($f->($xa), $f->($xb));
+  my ($xa, $xb, $xc, $xd, $xe);
+  my ($fa, $fb, $fc);
   my ($p, $q, $r, $s, $tol1, $xm);
   if ($do_bracket) {
     ($xa, $xb, $fa, $fb) = bracket($func, $x1, $x2, %params);
@@ -277,53 +277,93 @@ Readonly my $DEFAULT_INWARD_SPLIT => 3;
 Readonly my $DEFAULT_INWARD_FACTOR => 3;
 Readonly my $DEFAULT_OUTWARD_FACTOR => 1.6;
 
+sub _create_bracket_inward_state ($x1, $x2, $f1, %params) {
+  my $s = {};
+  $s->{split} = $params{inward_split} // $DEFAULT_INWARD_SPLIT;
+  croak 'inward_split must be at least 2' if $s->{split} < 2;
+  $s->{factor} = $params{inward_factor} // $DEFAULT_INWARD_FACTOR;
+  croak 'inward_factor must be at least 2' if $s->{factor} < 2;
+  @{$s}{'x1', 'x2'} = ($x1, $x2);
+  $s->{f1} = $f1;
+  return $s;
+}
+
+sub _do_bracket_inward ($f, $s) {
+  my $dx = ($s->{x2} - $s->{x1}) / $s->{split};
+  my $xa = $s->{x1};
+  my ($fa, $fb) = ($s->{f1});
+  for my $j (1..$s->{split}) {
+    my $xb = $xa + $dx;
+    $fb = $f->($xb);
+    if ($fa * $fb < 0) {
+      $s->{ret} = [$xa, $xb, $fa, $fb];
+      return 1;
+    }
+    ($xa, $fa) = ($xb, $fb);
+  }
+  $s->{split} *= $s->{factor};
+  return 0;
+}
+
+sub _create_bracket_outward_state ($f, $x1, $x2, $f1, %params) {
+  my $s = {};
+  $s->{factor} = $params{outward_factor} // $DEFAULT_OUTWARD_FACTOR;
+  croak 'outward_factor must be larger than 1' if $s->{factor} <= 1;
+  @{$s}{'x1', 'x2'} = ($x1, $x2);
+  @{$s}{'f1', 'f2'} = ($f1, $f->($x2));
+  return $s;
+}
+
+sub _do_bracket_outward ($f, $s) {
+  if ($s->{f1} * $s->{f2} < 0) {
+    $s->{ret} = [@{$s}{'x1', 'x2', 'f1', 'f2'}];
+    return 1;
+  }
+  if (abs($s->{f1}) < abs($s->{f2})) {
+    $s->{x1} += $s->{factor} * ($s->{x1} -$s->{x2});
+    $s->{f1} = $f->($s->{x1});
+  } else {
+    $s->{x2} += $s->{factor} * ($s->{x2} -$s->{x1});
+    $s->{f2} = $f->($s->{x2});
+  }
+  return 0;
+}
+
 sub bracket ($func, $x1, $x2, %params) {
   croak "\$x1 and \$x2 must be distinct in calls to Math::Numerical::bracket (${x1})" if $x1 == $x2;
   my $max_iter = $params{max_iterations} // $DEFAULT_MAX_ITERATIONS;
   croak 'max_iteration must be positive' if $max_iter <= 0;
-  my $do_outward = $params{do_outward} // 1;
-  my $do_inward = $params{do_inward} // 1;
-  croak 'One of do_outward and do_inward at least should be true'
-    unless $do_outward || $do_inward;
-  my $inward_split = $params{inward_split} // $DEFAULT_INWARD_SPLIT;
-  croak 'inward_split must be at least 2' if $inward_split < 2;
-  my $inward_factor = $params{inward_factor} // $DEFAULT_INWARD_FACTOR;
-  croak 'inward_factor must be at least 2' if $inward_factor < 2;
-  my $outward_factor = $params{outward_factor} // $DEFAULT_OUTWARD_FACTOR;
-  croak 'outward_factor must be larger than 1' if $outward_factor <= 1;
+
   my $f = _wrap_func($func);
-  my ($xl1, $xl2) = ($x1, $x2);
   my $f1 = $f->($x1);
-  my ($fl1, $fl2) = ($f1, $f->($xl2));
+
+  my $inward_state;
+  if ($params{do_inward} // 1) {
+    $inward_state = _create_bracket_inward_state($x1, $x2, $f1, %params);
+  }
+  my $outward_state;
+  if ($params{do_outward} // 1) {
+    $outward_state = _create_bracket_outward_state($f, $x1, $x2, $f1, %params);
+  }
+
+  croak 'One of do_outward and do_inward at least should be true'
+    unless defined $outward_state || defined $inward_state;
+
   for my $i (1..$max_iter) {
     # We start with outward because the first iteration does nothing and just
     # checks the bounds that were given by the user.
-    if ($do_outward) {
-      return ($xl1, $xl2, $fl1, $fl2) if $fl1 * $fl2 < 0;
-      if (abs($fl1) < abs($fl2)) {
-        $xl1 += $outward_factor * ($xl1 -$xl2);
-        $fl1 = $f->($xl1);
-      } else {
-        $xl2 += $outward_factor * ($xl2 -$xl1);
-        $fl2 = $f->($xl2);
-      }
+    if (defined $outward_state && _do_bracket_outward($f, $outward_state)) {
+      return @{$outward_state->{ret}};
     }
-    if ($do_inward) {
-      my $dx = ($x2 - $x1) / $inward_split;
-      my $xa = $x1;
-      my ($fa, $fb) = ($f1);
-      for my $j (1..$inward_split) {
-        my $xb = $xa + $dx;
-        $fb = $f->($xb);
-        return ($xa, $xb, $fa, $fb) if $fa * $fb < 0;
-        ($xa, $fa) = ($xb, $fb);
-      }
-      $inward_split *= $inward_factor;
+    if (defined $inward_state && _do_bracket_inward($f, $inward_state)) {
+      return @{$inward_state->{ret}};
     }
     # We stop doing the inward algorithm when the number of splits exceeds
     # max_iteration, to bound the number of times the function is executed to a
     # reasonable value.
-    $do_inward = 0 if $inward_split >= $max_iter;
+    if (defined $inward_state && $inward_state->{split} > $max_iter) {
+      undef $inward_state;
+    }
   }
   return;
 }
