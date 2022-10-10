@@ -30,6 +30,10 @@ sub safe_find_root {
 is(safe_find_root(\&CORE::cos, 0, 3, do_bracket => 0), float($PI / 2, tolerance => $tol));
 is(safe_find_root(\&CORE::cos, 0, 1), float($PI / 2, tolerance => $tol));
 is(solve(\&CORE::cos, 0, 1), float($PI / 2, tolerance => $tol));
+{
+  my @ret = find_root(\&CORE::cos, 0, 1);
+  is (\@ret, [float($PI /2, tolerance => $tol), cos($ret[0])]);
+}
 
 is(safe_find_root(sub { ($_[0] + 3) * ($_[0] - 1) ** 2 }, -4, 0), float(-3, tolerance => $tol));
 

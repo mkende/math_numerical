@@ -96,8 +96,10 @@ If the function is successful it returns the root found in scalar context or, in
 list context, a list with the root and the value of the function at that point
 (which may not be exactly C<0>).
 
-The current implementation of this function is based on the method C<zbrent>
-from the I<L<Numerical Recipes/NR>> book.
+The current implementation of this function is based on the Brent method
+described in the
+I<L<Numerical Recipes Third Edition|http://numerical.recipes/aboutNR3book.html>>
+book, section 9.3.
 
 The function supports the following parameters:
 
@@ -140,14 +142,70 @@ forwarded to that function.
 
 =cut
 
+sub _create_find_root_brent_state ($x1, $x2, $f1, $f2, %params) {
+  my $s = {};
+  $s->{tol} = $params{tolerance} // $_DEFAULT_TOLERANCE;
+  @{$s}{qw(a b c fa fb fc)} = ($x1, $x2, $x2, $f1, $f2, $f2);
+  @{$s}{qw(d e)} = (undef) x 2;
+  @{$s}{qw(p q r s tol1 xm)} = (undef) x 6;  ## no critic (ProhibitMagicNumbers)
+  return $s;
+}
+
+sub _do_find_root_brent ($f, $s) {
+  if (($s->{fb} > 0 && $s->{fc} > 0) || ($s->{fb} < 0 && $s->{fc} < 0)) {
+    ($s->{c}, $s->{fc}) = ($s->{a}, $s->{fa});
+    $s->{e} = $s->{d} = $s->{b} - $s->{a};
+  }
+  if (abs($s->{fc}) < abs($s->{fb})) {
+    ($s->{a}, $s->{b}, $s->{c}) = ($s->{b}, $s->{c}, $s->{b});
+    ($s->{fa}, $s->{fb}, $s->{fc}) = ($s->{fb}, $s->{fc}, $s->{fb});
+  }
+  $s->{tol1} = 2 * $EPS * abs($s->{b}) + $s->{tol} / 2;
+  $s->{xm} = ($s->{c} - $s->{b}) / 2;
+  if (abs($s->{xm}) <= $s->{tol1} || $s->{fb} == 0) {
+    $s->{ret} = [$s->{b}, $s->{fb}];
+    return 1
+  }
+  if (abs($s->{e}) >= $s->{tol1} && abs($s->{fa}) > abs($s->{fb})) {
+    $s->{s} = $s->{fb} / $s->{fa};
+    if ($s->{a} == $s->{c}) {
+      $s->{p} = 2 * $s->{xm} *$s->{s};
+      $s->{q} = 1 - $s->{s};
+    } else {
+      $s->{q} = $s->{fa} / $s->{fc};
+      $s->{r} = $s->{fb} / $s->{fc};
+      $s->{p} = $s->{s} * (2 * $s->{xm} * $s->{q} * ($s->{q} - $s->{r})- ($s->{b} - $s->{a}) * ($s->{r} - 1));
+      $s->{q} = ($s->{q} - 1) * ($s->{r} - 1) * ($s->{s} - 1);
+    }
+    $s->{q} = -$s->{q} if $s->{p} > 0;
+    $s->{p} = abs($s->{p});
+    Readonly my $interp_coef => 3;
+    my $min1 = $interp_coef * $s->{xm} * $s->{q} - abs($s->{tol1} * $s->{q});
+    my $min2 = abs($s->{e}* $s->{q});
+    if (2 * $s->{p} < ($min1 < $min2 ? $min1 : $min2)) {
+      $s->{e} = $s->{d};
+      $s->{d} = $s->{p} / $s->{q};
+    } else {
+      $s->{e} = $s->{d} = $s->{xm};
+    }
+  } else {
+    $s->{e} = $s->{d} = $s->{xm};
+  }
+  ($s->{a}, $s->{fa}) = ($s->{b}, $s->{fb});
+  if (abs($s->{d}) > $s->{tol1}) {
+    $s->{b} +=$s->{d};
+  } else {
+    $s->{b} += _sign($s->{tol1}, $s->{xm});
+  }
+  $s->{fb} = $f->($s->{b});
+  return 0;
+}
+
 sub find_root($func, $x1, $x2, %params) {
   my $do_bracket = $params{do_bracket} // 1;
-  my $tol = $params{tolerance} // $_DEFAULT_TOLERANCE;
   my $max_iter = $params{max_iterations} // $DEFAULT_MAX_ITERATIONS;
   my $f = _wrap_func($func);
-  my ($xa, $xb, $xc, $xd, $xe);
-  my ($fa, $fb, $fc);
-  my ($p, $q, $r, $s, $tol1, $xm);
+  my ($xa, $xb, $fa, $fb);
   if ($do_bracket) {
     ($xa, $xb, $fa, $fb) = bracket($func, $x1, $x2, %params);
     croak 'Can’t bracket a root of the function' unless defined $xa;
@@ -157,51 +215,13 @@ sub find_root($func, $x1, $x2, %params) {
     croak 'A root must be bracketed in [\$x1; \$x2]'
       if ($fa > 0 && $fb > 0) || ($fa < 0 && $fb <0);
   }
-  ($xc, $fc) = ($xb, $fb);
+
+  my $brent_state = _create_find_root_brent_state($xa, $xb, $fa, $fb, %params);
+
   for my $i (1..$max_iter) {
-    if (($fb > 0 && $fc > 0) || ($fb < 0 && $fc < 0)) {
-      ($xc, $fc) = ($xa, $fa);
-      $xe = $xd = $xb - $xa;
+    if (defined $brent_state && _do_find_root_brent($f, $brent_state)) {
+      return wantarray ? @{$brent_state->{ret}} : $brent_state->{ret}[0];
     }
-    if (abs($fc) < abs($fb)) {
-      ($xa, $xb, $xc) = ($xb, $xc, $xb);
-      ($fa, $fb, $fc) = ($fb, $fc, $fb);
-    }
-    $tol1 = 2 * $EPS * abs($xb) + $tol / 2;
-    $xm = ($xc - $xb) / 2;
-    return wantarray ? ($xb, $fb) : $xb if abs($xm) <= $tol1 || $fb == 0;
-    if (abs($xe) >= $tol1 && abs($fa) > abs($fb)) {
-      $s = $fb / $fa;
-      if ($xa == $xc) {
-        $p = 2 * $xm *$s;
-        $q = 1 - $s;
-      } else {
-        $q = $fa / $fc;
-        $r = $fb / $fc;
-        $p = $s * (2 * $xm * $q * ($q - $r)- ($xb - $xa) * ($r - 1));
-        $q = ($q - 1) * ($r - 1) * ($s - 1);
-      }
-      $q = -$q if $p > 0;
-      $p = abs($p);
-      Readonly my $interp_coef => 3;
-      my $min1 = $interp_coef * $xm * $q - abs($tol1 * $q);
-      my $min2 = abs($xe* $q);
-      if (2 * $p < ($min1 < $min2 ? $min1 : $min2)) {
-        $xe = $xd;
-        $xd = $p / $q;
-      } else {
-        $xe = $xd = $xm;
-      }
-    } else {
-      $xe = $xd = $xm;
-    }
-    ($xa, $fa) = ($xb, $fb);
-    if (abs($xd) > $tol1) {
-      $xb +=$xd;
-    } else {
-      $xb += _sign($tol1, $xm);
-    }
-    $fb = $f->($xb);
   }
   return;
 }
@@ -235,8 +255,10 @@ Otherwise it returns an empty list.
 If C<$x2> is omitted or equal to C<$x1> then a value slightly larger than C<$x1>
 will be used. Note that if it is omitted then C<%params> cannot be specified.
 
-The current implementation of this method is a mix of the methods C<zbrac> and
-C<zbrak> from the I<L<Numerical Recipes/NR>> book.
+The current implementation is a mix of the inward and outward bracketing
+approaches exposed in the
+I<L<Numerical Recipes Third Edition|http://numerical.recipes/aboutNR3book.html>>
+book, section 9.1.
 
 The function supports the following parameters:
 
@@ -415,9 +437,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 =over
 
-=item NR
-
-L<http://numerical.recipes/>
+=item L<Numerical Recipes Third Edition|http://numerical.recipes/aboutNR3book.html>
 
 =back
 
