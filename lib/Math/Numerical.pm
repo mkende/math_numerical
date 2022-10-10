@@ -220,7 +220,8 @@ If the function is successful, it returns a list of four elements with the
 values C<$a> and C<$b> and then the values of function at these two points.
 Otherwise it returns an empty list.
 
-The function will C<L<croak|Carp>> if C<$x1> and C<$x2> are equal.
+If C<$x2> is omitted or equal to C<$x1> then a value slightly larger than C<$x1>
+will be used. Note that if it is omitted then C<%params> cannot be specified.
 
 The current implementation of this method is a mix of the methods C<zbrac> and
 C<zbrak> from the I<L<Numerical Recipes/NR>> book.
@@ -229,7 +230,7 @@ The function supports the following parameters:
 
 =over
 
-=item C<max_iteration>
+=item C<max_iterations>
 
 How many iterations of our algorithm will be applied at most while trying to
 bracket the given function. This gives an order of magnitude of the number of
@@ -244,6 +245,8 @@ one given by C<[$x1, $x2]>. Defaults to I<1>.
 
 Whether the function will try to bracket a root in an interval smaller than the
 one given by C<[$x1, $x2]>. Defaults to I<1>.
+
+One of C<do_inward> or C<do_outward> at least must be a  true value.
 
 =item C<inward_split>
 
@@ -329,10 +332,13 @@ sub _do_bracket_outward ($f, $s) {
   return 0;
 }
 
-sub bracket ($func, $x1, $x2, %params) {
-  croak "\$x1 and \$x2 must be distinct in calls to Math::Numerical::bracket (${x1})" if $x1 == $x2;
+sub bracket ($func, $x1, $x2 = undef, %params) {
+  if (!defined $x2 || $x1 == $x2) {
+    Readonly my $LARGISH_FACTOR => 1000;
+    $x2 += $LARGISH_FACTOR * $EPS;
+  }
   my $max_iter = $params{max_iterations} // $DEFAULT_MAX_ITERATIONS;
-  croak 'max_iteration must be positive' if $max_iter <= 0;
+  croak 'max_iterations must be positive' if $max_iter <= 0;
 
   my $f = _wrap_func($func);
   my $f1 = $f->($x1);
@@ -346,7 +352,7 @@ sub bracket ($func, $x1, $x2, %params) {
     $outward_state = _create_bracket_outward_state($f, $x1, $x2, $f1, %params);
   }
 
-  croak 'One of do_outward and do_inward at least should be true'
+  croak 'One of do_outward and do_inward at least must be true'
     unless defined $outward_state || defined $inward_state;
 
   for my $i (1..$max_iter) {
