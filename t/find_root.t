@@ -35,6 +35,12 @@ is(solve(\&CORE::cos, 0, 1), float($PI / 2, tolerance => $tol));
   is (\@ret, [float($PI /2, tolerance => $tol), cos($ret[0])]);
 }
 
+like(scalar(eval { find_root(\&CORE::cos, 0, 1, do_bracket => 0) }, $@),
+     qr/A root must be bracketed in/);
+
+like(scalar(eval { find_root(sub { 1 }, 0, 1) }, $@),
+     qr/Can’t bracket a root of the function/);
+
 is(safe_find_root(sub { ($_[0] + 3) * ($_[0] - 1) ** 2 }, -4, 0), float(-3, tolerance => $tol));
 
 # Example from https://fr.wikipedia.org/wiki/Taux_effectif_global#Ech%C3%A9ances_mensuelles_constantes_en_fin_de_mois

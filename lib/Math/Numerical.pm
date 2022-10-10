@@ -153,12 +153,12 @@ sub _create_find_root_brent_state ($x1, $x2, $f1, $f2, %params) {
 
 sub _do_find_root_brent ($f, $s) {
   if (($s->{fb} > 0 && $s->{fc} > 0) || ($s->{fb} < 0 && $s->{fc} < 0)) {
-    ($s->{c}, $s->{fc}) = ($s->{a}, $s->{fa});
+    @{$s}{'c', 'fc'} = @{$s}{'a', 'fa'};
     $s->{e} = $s->{d} = $s->{b} - $s->{a};
   }
   if (abs($s->{fc}) < abs($s->{fb})) {
-    ($s->{a}, $s->{b}, $s->{c}) = ($s->{b}, $s->{c}, $s->{b});
-    ($s->{fa}, $s->{fb}, $s->{fc}) = ($s->{fb}, $s->{fc}, $s->{fb});
+    @{$s}{'a', 'b', 'c'} = @{$s}{'b', 'c', 'b'};
+    @{$s}{'fa', 'fb', 'fc'} = @{$s}{'fb', 'fc', 'fb'};
   }
   $s->{tol1} = 2 * $EPS * abs($s->{b}) + $s->{tol} / 2;
   $s->{xm} = ($s->{c} - $s->{b}) / 2;
@@ -191,7 +191,7 @@ sub _do_find_root_brent ($f, $s) {
   } else {
     $s->{e} = $s->{d} = $s->{xm};
   }
-  ($s->{a}, $s->{fa}) = ($s->{b}, $s->{fb});
+  @{$s}{'a', 'fa'} = @{$s}{'b', 'fb'};
   if (abs($s->{d}) > $s->{tol1}) {
     $s->{b} +=$s->{d};
   } else {
