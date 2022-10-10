@@ -4,7 +4,7 @@ use utf8;
 
 use Test2::V0;
 
-use Math::Numerical 'find_root';
+use Math::Numerical 'find_root', 'solve';
 
 use Carp;
 use Readonly;
@@ -28,7 +28,8 @@ sub safe_find_root {
 }
 
 is(safe_find_root(\&CORE::cos, 0, 3, do_bracket => 0), float($PI / 2, tolerance => $tol));
-is(safe_find_root(\&CORE::cos, 0, 1), float($PI / 2, tolerance => 0.00001));
+is(safe_find_root(\&CORE::cos, 0, 1), float($PI / 2, tolerance => $tol));
+is(solve(\&CORE::cos, 0, 1), float($PI / 2, tolerance => $tol));
 
 is(safe_find_root(sub { ($_[0] + 3) * ($_[0] - 1) ** 2 }, -4, 0), float(-3, tolerance => $tol));
 

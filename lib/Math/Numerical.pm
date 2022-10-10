@@ -57,7 +57,7 @@ be selectively imported or you can import them all with the tag C<:all>.
 
 =cut
 
-our @EXPORT_OK = qw(find_root bracket);
+our @EXPORT_OK = qw(find_root solve bracket);
 our %EXPORT_TAGS = (all => \@EXPORT_OK);
 
 # This will need to be adapted if we start using bigfloat.
@@ -205,6 +205,18 @@ sub find_root($func, $x1, $x2, %params) {
   }
   return;
 }
+
+=head2 solve
+
+  solve($func, $x1, $x2, %params)
+
+This is an exact synonym of C<find_root($func, $x1, $x2, %params)> in case you
+prefer another name. See the documentation of the C<L<find_root|/find_root>>
+function for all the details.
+
+=cut
+
+sub solve { return find_root(@_) }
 
 =head2 bracket
 
