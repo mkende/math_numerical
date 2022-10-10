@@ -1,8 +1,8 @@
-use Test2::V0;
-
 use strict;
 use warnings;
 use utf8;
+
+use Test2::V0;
 
 use Math::Numerical 'bracket';
 
