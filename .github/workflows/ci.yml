@@ -39,6 +39,8 @@ jobs:
         cpanm Readonly
 
     - name: Run tests
+      env:
+        TEST_AUTHOR: 1
       run: |
         perl Makefile.PL
         make
