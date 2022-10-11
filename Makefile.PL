@@ -15,10 +15,8 @@ WriteMakefile(
     CONFIGURE_REQUIRES => {
       'ExtUtils::MakeMaker' => '0',
     },
-    BUILD_REQUIRES => {
-      'Readonly' => '0',
-    },
     PREREQ_PM => {
+      'Readonly' => '0',
     },
     TEST_REQUIRES => {
       'Test2::V0'             => 0,
@@ -32,10 +30,21 @@ WriteMakefile(
       prereqs => {
         tests => {
           suggests => {
-            'Devel::Cover'             => 0,
             'Perl::Tidy'               => 0,
             'Test::Pod'                => '1.00',
             'Test2::Tools::PerlCritic' => 0,
+          },
+        },
+      },
+      optional_features => {
+        test_coverage => {
+          description => 'Run `make cover` to compute test coverage',
+          prereqs => {
+            tests => {
+              requires => {
+                'Devel::Cover' => 0,
+              },
+            },
           },
         },
       },
@@ -65,6 +74,10 @@ sub MY::postamble {
 
     tidy:
     \tperltidy -b lib/Math/Numerical.pm
+
+    tidydiff:
+    \tperltidy lib/Math/Numerical.pm
+    \tdiff -u lib/Math/Numerical.pm lib/Math/Numerical.pm.tdy
 
     spelling:
     \tperl -Ilib t/00-spelling.t --interactive

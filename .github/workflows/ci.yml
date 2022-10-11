@@ -31,13 +31,7 @@ jobs:
     - name: Install Modules
       run: |
         cpanm -v
-        cpanm --installdeps --notest .
-        cpanm --notest Perl::Tidy
-        cpanm --notest Test2::V0
-        cpanm --notest Test2::Tools::PerlCritic
-        cpanm --notest Test::Pod
-        cpanm --notest IPC::Run3
-        cpanm --notest Readonly
+        cpanm --installdeps --notest --with-recommends --with-suggest .
 
     - name: Run tests
       env:
