@@ -1,8 +1,10 @@
 \.aspell.en.prepl
 \.git/
 \.gitignore
-Math-Numericalw-.*
+\.github
+Math-Numerical-.*
 blib/
+cover_db/
 Makefile$
 Makefile\.old
 MANIFEST\.bak
