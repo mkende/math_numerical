@@ -34,12 +34,22 @@ jobs:
         cpanm -v --installdeps --notest --with-recommends --with-suggests .
 
     - name: Run tests
+      if:  ${{ !startsWith( matrix.runner, 'windows-')}}
       env:
         TEST_AUTHOR: 1
       run: |
         perl Makefile.PL
         make
         make test
+
+    - name: Run tests on Windows
+      if:  ${{ startsWith( matrix.runner, 'windows-')}}
+      env:
+        TEST_AUTHOR: 1
+      run: |
+        perl Makefile.PL MAKE=gmake
+        gmake
+        gmake test
 
     - name: Show Errors on Windows
       if:  ${{ failure() && startsWith( matrix.runner, 'windows-')}}
