@@ -22,10 +22,11 @@ WriteMakefile(
       'Test2::V0'             => 0,
       'Test2::Tools::Compare' => 0,
     },
-    NO_MYMETA => 1,
+    # We don’t really need a MYMETA file, but then cpanm can’t correctly find
+    # our dependencies. CPAN works correctly either way.
+    # NO_MYMETA => 1,
     META_MERGE => {
       'meta-spec' => { version => 2 },
-      # Goes with NO_MYMETA (which would provide the dynamic config).
       dynamic_config => 0,
       prereqs => {
         test => {
