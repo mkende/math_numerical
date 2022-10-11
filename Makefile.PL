@@ -56,20 +56,21 @@ WriteMakefile(
 );
 
 sub MY::postamble {
-  return <<~"MAKE_FRAGMENT"
-    cover:
-    \tcover -test
+  return <<MAKE_FRAGMENT
+cover:
+\tcover -test
 
-    critic:
-    \tperlcritic lib
+critic:
+\tperlcritic lib
 
-    tidy:
-    \tperltidy -b lib/Math/Numerical.pm
+tidy:
+\tperltidy -b lib/Math/Numerical.pm
 
-    spelling:
-    \tperl -Ilib t/00-spelling.t --interactive
+spelling: export TEST_AUTHOR = 1
+spelling:
+\tperl -Ilib t/00-spelling.t --interactive
 
-    alltest: export TEST_AUTHOR = 1
-    alltest: test
-    MAKE_FRAGMENT
+alltest: export TEST_AUTHOR = 1
+alltest: test
+MAKE_FRAGMENT
 }
