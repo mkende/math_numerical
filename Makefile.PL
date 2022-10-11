@@ -39,12 +39,19 @@ WriteMakefile(
         },
       },
       optional_features => {
+<<<<<<< HEAD
         # This is set as an optional feature so that the GitHub CI does not need
         # to fetch this module that has a lot of dependencies.
         test_coverage => {
           description => 'Run `make cover` to compute test coverage',
           prereqs => {
             test => {
+=======
+        test_coverage => {
+          description => 'Run `make cover` to compute test coverage',
+          prereqs => {
+            tests => {
+>>>>>>> 3d9a8e1 (Fix the Makefile.PL deps and use the --with-suggest flag to cpanm in the CI actions.)
               requires => {
                 'Devel::Cover' => 0,
               },
