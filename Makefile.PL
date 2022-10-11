@@ -19,6 +19,7 @@ WriteMakefile(
       'Readonly' => '0',
     },
     TEST_REQUIRES => {
+      'IPC::Run3'             => 0,
       'Test2::V0'             => 0,
       'Test2::Tools::Compare' => 0,
     },
