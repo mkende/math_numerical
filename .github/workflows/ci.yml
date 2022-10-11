@@ -32,6 +32,7 @@ jobs:
       run: |
         cpanm -v
         cpanm --installdeps .
+        cpanm Test2::V0
 
     - name: Run tests
       run: |
