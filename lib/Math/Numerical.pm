@@ -97,7 +97,9 @@ starting interval.
 
 If the function is successful it returns the root found in scalar context or, in
 list context, a list with the root and the value of the function at that point
-(which may not be exactly C<0>).
+(which may not be exactly C<0>). Some options can control the precision of the
+returned root. Note that, for discontinuous or pathological functions, the
+returned value may not be a root at all.
 
 The current implementation of this function is based on the Brent method
 described in the
@@ -134,6 +136,10 @@ C<L<bracket|/bracket>> can also be passed to C<find_root>.
 Defaults to I<1>.
 
 =item C<tolerance>
+
+The tolerance of the root found on the x-axis. That is, the returned value or,
+in list context, the first returned value will not be further away from the
+actual root than this value.
 
 Defaults to I<0.00001>.
 
