@@ -32,11 +32,11 @@ jobs:
       run: |
         cpanm -v
         cpanm --installdeps --notest .
-        cpanm Test2::V0
-        cpanm Test2::Tools::PerlCritic
-        cpanm Test::Pod
-        cpanm IPC::Run3
-        cpanm Readonly
+        cpanm --notest Test2::V0
+        cpanm --notest Test2::Tools::PerlCritic
+        cpanm --notest Test::Pod
+        cpanm --notest IPC::Run3
+        cpanm --notest Readonly
 
     - name: Run tests
       env:
