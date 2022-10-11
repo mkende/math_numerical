@@ -31,7 +31,7 @@ jobs:
     - name: Install Modules
       run: |
         cpanm -v
-        cpanm --installdeps .
+        cpanm --installdeps --notest .
         cpanm Test2::V0
         cpanm Test2::Tools::PerlCritic
         cpanm Test::Pod
