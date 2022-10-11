@@ -32,9 +32,10 @@ WriteMakefile(
       prereqs => {
         tests => {
           suggests => {
-            'Perl::Tidy'           => 0,
-            'Test::Pod'            => '1.00',
-            'Test2::Tools::PerlCritic'   => 0,
+            'Devel::Cover'             => 0,
+            'Perl::Tidy'               => 0,
+            'Test::Pod'                => '1.00',
+            'Test2::Tools::PerlCritic' => 0,
           },
         },
       },
@@ -56,6 +57,9 @@ WriteMakefile(
 
 sub MY::postamble {
   return <<~"MAKE_FRAGMENT"
+    cover:
+    \tcover -test
+
     critic:
     \tperlcritic lib
 
@@ -65,7 +69,7 @@ sub MY::postamble {
     spelling:
     \tperl -Ilib t/00-spelling.t --interactive
 
-    alltest:
-    \tTEST_AUTHOR=1 make test
+    alltest: export TEST_AUTHOR = 1
+    alltest: test
     MAKE_FRAGMENT
 }

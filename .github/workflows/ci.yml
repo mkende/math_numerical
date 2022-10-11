@@ -32,6 +32,7 @@ jobs:
       run: |
         cpanm -v
         cpanm --installdeps --notest .
+        cpanm --notest Perl::Tidy
         cpanm --notest Test2::V0
         cpanm --notest Test2::Tools::PerlCritic
         cpanm --notest Test::Pod
