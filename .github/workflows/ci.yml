@@ -14,10 +14,10 @@ jobs:
         # Strawberry Perl does not have 5.36 for now, but only 5.32
         exclude:
           - runner: windows-latest
-          - perl: '5.36'
+            perl: '5.36'
         include:
           - runner: windows-latest
-          - perl: '5.32'
+            perl: '5.32'
 
     runs-on: ${{matrix.runner}}
     name: OS ${{matrix.runner}} Perl ${{matrix.perl}}
