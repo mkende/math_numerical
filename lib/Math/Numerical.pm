@@ -14,6 +14,7 @@ use Carp;
 use Config;
 use English;
 use Exporter 'import';
+use Hash::Util 'lock_keys';
 use POSIX ();
 use Readonly;
 
@@ -145,11 +146,12 @@ forwarded to that function.
 =cut
 
 sub _create_find_root_brent_state ($x1, $x2, $f1, $f2, %params) {
-  my $s = {};
+  my $s = {ret => undef};
   $s->{tol} = $params{tolerance} // $_DEFAULT_TOLERANCE;
   @{$s}{qw(a b c fa fb fc)} = ($x1, $x2, $x2, $f1, $f2, $f2);
   @{$s}{qw(d e)} = (undef) x 2;
   @{$s}{qw(p q r s tol1 xm)} = (undef) x 6;  ## no critic (ProhibitMagicNumbers)
+  lock_keys(%{$s});
   return $s;
 }
 
@@ -320,13 +322,14 @@ Readonly my $DEFAULT_INWARD_FACTOR => 3;
 Readonly my $DEFAULT_OUTWARD_FACTOR => 1.6;
 
 sub _create_bracket_inward_state ($x1, $x2, $f1, %params) {
-  my $s = {};
+  my $s = {ret => undef};
   $s->{split} = $params{inward_split} // $DEFAULT_INWARD_SPLIT;
   croak 'inward_split must be at least 2' if $s->{split} < 2;
   $s->{factor} = $params{inward_factor} // $DEFAULT_INWARD_FACTOR;
   croak 'inward_factor must be at least 2' if $s->{factor} < 2;
   @{$s}{'x1', 'x2'} = ($x1, $x2);
   $s->{f1} = $f1;
+  lock_keys(%{$s});
   return $s;
 }
 
@@ -348,11 +351,12 @@ sub _do_bracket_inward ($f, $s) {
 }
 
 sub _create_bracket_outward_state ($f, $x1, $x2, $f1, %params) {
-  my $s = {};
+  my $s = {ret => undef};
   $s->{factor} = $params{outward_factor} // $DEFAULT_OUTWARD_FACTOR;
   croak 'outward_factor must be larger than 1' if $s->{factor} <= 1;
   @{$s}{'x1', 'x2'} = ($x1, $x2);
   @{$s}{'f1', 'f2'} = ($f1, $f->($x2));
+  lock_keys(%{$s});
   return $s;
 }
 
