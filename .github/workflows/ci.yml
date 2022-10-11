@@ -49,6 +49,10 @@ jobs:
         make
         make test
 
+    # On Windows there is no 'make' command. It seems that Makefile.PL defaults
+    # to using 'dmake' which is maybe installed on the GitHub VMs. However we
+    # know that there is a 'gmake' included with Strawberry Perl, so let’s use
+    # that one.
     - name: Run tests on Windows
       if:  ${{ startsWith( matrix.runner, 'windows-')}}
       env:
