@@ -28,7 +28,7 @@ WriteMakefile(
       # Goes with NO_MYMETA (which would provide the dynamic config).
       dynamic_config => 0,
       prereqs => {
-        tests => {
+        test => {
           suggests => {
             'Perl::Tidy'               => 0,
             'Test::Pod'                => '1.00',
@@ -40,7 +40,7 @@ WriteMakefile(
         test_coverage => {
           description => 'Run `make cover` to compute test coverage',
           prereqs => {
-            tests => {
+            test => {
               requires => {
                 'Devel::Cover' => 0,
               },
