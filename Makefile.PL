@@ -32,7 +32,7 @@ WriteMakefile(
       prereqs => {
         test => {
           suggests => {
-            'Perl::Tidy'               => 0,
+            'Perl::Tidy'               => '20220613',
             'Test::Pod'                => '1.00',
             'Test2::Tools::PerlCritic' => 0,
           },
