@@ -39,6 +39,8 @@ WriteMakefile(
         },
       },
       optional_features => {
+        # This is set as an optional feature so that the GitHub CI does not need
+        # to fetch this module that has a lot of dependencies.
         test_coverage => {
           description => 'Run `make cover` to compute test coverage',
           prereqs => {
