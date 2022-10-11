@@ -33,6 +33,10 @@ jobs:
         cpanm -v
         cpanm --installdeps .
         cpanm Test2::V0
+        cpanm Test2::Tools::PerlCritic
+        cpanm Test::Pod
+        cpanm IPC::Run3
+        cpanm Readonly
 
     - name: Run tests
       run: |
