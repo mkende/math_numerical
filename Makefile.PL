@@ -65,7 +65,7 @@ WriteMakefile(
       },
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
-    clean => { FILES => 'Math-Numerical-*' },
+    clean => { FILES => 'Math-Numerical-* cover_db' },
 );
 
 sub MY::postamble {
