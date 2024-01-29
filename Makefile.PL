@@ -1,58 +1,34 @@
+# DO NOT EDIT! This file is written by perl_setup_dist.
+# If needed, you can add content at the end of the file.
+
 use 5.022;
 use strict;
 use warnings;
-use ExtUtils::MakeMaker;
+use ExtUtils::MakeMaker::CPANfile;
 
 
 WriteMakefile(
     NAME             => 'Math::Numerical',
+    DISTNAME         => 'Math-Numerical',
     AUTHOR           => q{Mathias Kende <mathias@cpan.org>},
     VERSION_FROM     => 'lib/Math/Numerical.pm',
-    ABSTRACT         => "Algorithms for numerical functions (solver, root findings, etc.)",
+    ABSTRACT         => q{Algorithms for numerical functions (solver, root findings, etc.).},
     LICENSE          => 'mit',
+    
     MIN_PERL_VERSION => '5.022',
     MAN3PODS         => {},
-    CONFIGURE_REQUIRES => {
-      'ExtUtils::MakeMaker' => '0',
-    },
-    PREREQ_PM => {
-      'Readonly' => '0',
-    },
-    TEST_REQUIRES => {
-      'IPC::Run3'             => 0,
-      'Test2::V0'             => 0,
-      'Test2::Tools::Compare' => '0.000081',
-    },
-    # We don’t really need a MYMETA file, but then cpanm can’t correctly find
-    # our dependencies. CPAN works correctly either way.
-    # NO_MYMETA => 1,
+    # Directories in which we look for Makefile.PL. In general could be omitted but is needed in case there
+    # is a file named Makefile.PL in a sub-directory. Should be customized if such a file needs to be
+    # processed by ExtUtils.
+    DIR              => [],
+    NO_MYMETA => 1,
     META_MERGE => {
       'meta-spec' => { version => 2 },
+      # Goes with NO_MYMETA (which would provide the dynamic config).
       dynamic_config => 0,
-      prereqs => {
-        test => {
-          suggests => {
-            'Perl::Tidy'               => '20220613',
-            'Test::Pod'                => '1.00',
-            'Test2::Tools::PerlCritic' => 0,
-          },
-        },
+      no_index => {
+        directory => [ 'local', 'vendor' ],
       },
-      optional_features => {
-        # This is set as an optional feature so that the GitHub CI does not need
-        # to fetch this module that has a lot of dependencies.
-        test_coverage => {
-          description => 'Run `make cover` to compute test coverage',
-          prereqs => {
-            test => {
-              requires => {
-                'Devel::Cover' => 0,
-              },
-            },
-          },
-        },
-      },
-      keywords => [ qw(math numerical analysis root solver derivative integral) ],
       resources => {
         repository => {
           type => 'git',
@@ -64,30 +40,41 @@ WriteMakefile(
         },
       },
     },
-    dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
-    clean => { FILES => 'Math-Numerical-* cover_db' },
+    dist  => { COMPRESS => 'gzip -9f', SUFFIX => '.gz', },
+    clean => { FILES => 'Math-Numerical-*' },
 );
 
 sub MY::postamble {
-  return <<MAKE_FRAGMENT
+  my ($self) = @_;
+
+  my @postamble;
+  push @postamble, ::postamble() if *::postamble{CODE};
+
+  push @postamble, <<"MAKE_FRAGMENT";
+distupload: tardist
+\tcpan-upload --directory Math-Numerical \$(DISTVNAME).tar\$(SUFFIX)
+
 cover:
 \tcover -test
 
 critic:
-\tperlcritic lib
+\tperlcritic lib 
 
 tidy:
-\tperltidy -b lib/Math/Numerical.pm
+\tperltidy -b -bext='/' \$(shell find lib -name "*.pm")
 
-tidydiff:
-\tperltidy lib/Math/Numerical.pm
-\tdiff -u lib/Math/Numerical.pm lib/Math/Numerical.pm.tdy
-
-spelling: export TEST_AUTHOR = 1
+spelling: export EXTENDED_TESTING = 1
 spelling:
-\tperl -Ilib t/00-spelling.t --interactive
+\t\$(PERLRUN) t/001-spelling.t --interactive
 
-alltest: export TEST_AUTHOR = 1
+alltest: export EXTENDED_TESTING = 1
 alltest: test
 MAKE_FRAGMENT
+
+  return join "\n", @postamble;
 }
+
+# You can add below this template a `postamble` sub that returns more content to
+# add to the generated Makefile.
+
+# End of the template. You can add custom content below this line.

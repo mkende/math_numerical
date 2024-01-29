@@ -1,3 +1,6 @@
+# DO NOT EDIT! This file is written by perl_setup_dist.
+# If needed, you can add content at the end of the file.
+
 # The reference for all the formatting options is at:
 # https://metacpan.org/pod/distribution/Perl-Tidy/bin/perltidy#FORMATTING-OPTIONS
 
@@ -59,3 +62,5 @@
 # Unfortunately we can’t control vertical alignment depending on the context. So let’s disable it for now.
 # Feature request for more control: https://rt.cpan.org/Ticket/Display.html?id=136416
 -novalign
+
+# End of the template. You can add custom content below this line.

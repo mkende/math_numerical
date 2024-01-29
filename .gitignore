@@ -1,22 +1,19 @@
-Makefile
-Makefile.old
-MANIFEST
-MANIFEST.bak
-/META.*
-/MYMETA.*
+# DO NOT EDIT! This file is written by perl_setup_dist.
+# If needed, you can add content at the end of the file.
+
 /.aspell.en.prepl
-.build/
-_build/
-cover_db/
-blib/
-inc/
-.lwpcookies
-.last_cover_stats
-nytprof.out
-pod2htm*.tmp
-pm_to_blib
-Math-Numerical-*
-Math-Numerical-*.tar.gz
-*.stackdump
+/Makefile
+/Makefile.old
+/MANIFEST
+/MANIFEST.bak
+/blib/
+/local/
+/pm_to_blib
+/temp/
+/vendor/
+/*.tar.gz
 *.bak
 *.tdy
+/Math-Numerical-*/
+
+# End of the template. You can add custom content below this line.

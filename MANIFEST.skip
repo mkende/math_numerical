@@ -1,18 +1,29 @@
-\.aspell.en.prepl
-\.git/
-\.gitignore
-\.github
-Math-Numerical-.*
-blib/
-cover_db/
-Makefile$
-Makefile\.old
-MANIFEST\.bak
-MANIFEST\.skip
-MYMETA.*
-pm_to_blib
-math_numerical\.sublime-project
-math_numerical\.sublime-workspace
-.*\.stackdump
-.*\.bak
-.*\.tdy
+# DO NOT EDIT! This file is written by perl_setup_dist.
+# If needed, you can add content at the end of the file.
+
+^\.aspell\..*$
+^\.aspelldict$
+^\.devcontainer/
+^\.git/
+^\.github/
+^\.gitignore$
+^\.gitmodules$
+^\.perlcriticrc$
+^\.perltidyrc$
+^Makefile$
+^Makefile.old$
+^MANIFEST\.bak$
+^MANIFEST\.SKIP$
+^blib/
+^cpanfile\.snapshot$
+^dist_setup\.conf$
+^local/
+^t/001-perlcritic.t
+^t/001-perltidy.t
+^t/001-spelling.t
+^third_party/
+^pm_to_blib$
+^Math-Numerical-[\d.]+/
+^Math-Numerical-[\d.]+\.tar\.gz
+
+# End of the template. You can add custom content below this line.
