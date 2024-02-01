@@ -14,7 +14,7 @@ BEGIN {
 }
 {
   no warnings 'once';  ## no critic (ProhibitNoWarnings)
-  note("Testing Math::Numerical $Math::Numerical::VERSION, Perl $], $^X, $ENV{SHELL}");
+  note("Testing Math::Numerical $Math::Numerical::VERSION, Perl $], $^X");
 }
 
 done_testing;
