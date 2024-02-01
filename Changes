@@ -1,5 +1,9 @@
 Revision history for Perl module Math::Numerical
 
+0.06 ??
+
+ - Updated the distribution to using Dist::Setup
+
 0.05 2022-10-15
 
  - Update requirements for the Test2::Tools::Compare dist to 0.000081 which has

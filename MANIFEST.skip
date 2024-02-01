@@ -25,5 +25,6 @@
 ^pm_to_blib$
 ^Math-Numerical-[\d.]+/
 ^Math-Numerical-[\d.]+\.tar\.gz
+.*\.bak
 
 # End of the template. You can add custom content below this line.

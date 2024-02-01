@@ -1,6 +1,8 @@
 # DO NOT EDIT! This file is written by perl_setup_dist.
 # If needed, you can add content at the end of the file.
 
+## no critic (Policy)
+
 use 5.022;
 use strict;
 use warnings;

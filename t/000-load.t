@@ -7,11 +7,13 @@ use strict;
 use warnings;
 use Test2::V0;
 
+our $VERSION = 0.01;
+
 BEGIN {
-  ok(eval "use Math::Numerical; 1", "use Math::Numerical");
+  ok(eval 'use Math::Numerical; 1', 'use Math::Numerical');  ## no critic (ProhibitStringyEval, RequireCheckingReturnValueOfEval)
 }
 {
-  no warnings 'once';
+  no warnings 'once';  ## no critic (ProhibitNoWarnings)
   note("Testing Math::Numerical $Math::Numerical::VERSION, Perl $], $^X, $ENV{SHELL}");
 }
 
